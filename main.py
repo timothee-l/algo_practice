@@ -1,90 +1,42 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-import math
+from math import *
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def karatsuba(x, y):
+    # 0. Base case
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
-def karatsuba(x, y, initial=False):
-    # todo: séparer les ints en 2 moitiés
-    # todo: appels récursifs
-    # todo: cas élémentaire
-    # int en base 10, multiple de 2
-    x_str = str(x)
-    y_str = str(y)
-    array_x = [n for n in x_str]
-    array_y = [n for n in y_str]
-    div = False
-    if len(array_x) < len(array_y):
-        array_x.append(0)
-        div = True
-    elif len(array_x) > len(array_y):
-        array_y.append(0)
-        div = True
-    if (len(array_x) == len(array_y)) and (len(array_x) == 1):
-        # x et y < 10
+    if x <= 10 or y <= 10:
+        # Base case
         return x * y
-    # split
-    a = 0
-    b = 0
-    n = max(len(array_x),len(array_y))
-    for index, i in enumerate(array_x):
-        if index < math.floor(n / 2):
-            a *= 10
-            a += int(i)
-            print("a ", a)
-        else:
-            b *= 10
-            b += int(i)
-            print("b ", b)
-    c = 0
-    d = 0
-    for index, i in enumerate(array_y):
-        if index < math.floor(n / 2):
-            c *= 10
-            c += int(i)
-            print("c ", c)
-        else:
-            d *= 10
-            d += int(i)
-            print("d ", d)
-    a = int(a)
-    b = int(b)
-    c = int(c)
-    d = int(d)
-    print("----")
-    alpha = karatsuba(a, c)
-    beta = karatsuba(b, d)
-    # karatsuba:
-    # gamma = karatsuba(a+b,c+d)
-    # delta = gamma-beta-alpha
-    # classique:
-    delta = karatsuba(a, d) + karatsuba(b, c)
-    eq1 = alpha * pow(10, n)
-    eq2 = delta * pow(10, n // 2)
-    res = eq1 + eq2 + beta
-    if div:
-        res/=10
-    if initial:
-        print("n: ",n)
-        print("alpha", alpha)
-        print("beta", beta)
-        print("delta", delta)
+
+    # 1. Split ints
+
+    n_x = ceil(log(x, 10))  # Nb of digits in x
+    n_y = ceil(log(y, 10))
+
+    n = max(n_x, n_y)
+
+    b = x % (10 ** (n // 2))
+    a = x // (10 ** (n // 2))  # si int(x / (10** (n//2))) => perte de précision sur le float d'où résultat
+    # erronné si nombre très grand (imprécision sur la mantisse)
+    d = y % (10 ** (n // 2))
+    c = y // (10 ** (n // 2))
+    #On peut aussi utiliser divmod
+
+    # 2. Recursive calls
+
+    ac = karatsuba(a, c)
+    bd = karatsuba(b, d)
+    kara = karatsuba((a + b), (c + d))
+
+    res = ac * (10 ** (2 * (n // 2))) + (kara - ac - bd) * (10 ** (n // 2)) + bd
+    # ac * (10 ** (n//2)) ne fonctionne pas, pourquoi?
+
     return res
 
 
-x = 224
-y = 369
-print(karatsuba(x, y, True))
+if __name__ == '__main__':
+    x = 3141592653589793238462643383279502884197169399375105820974944592
+    y = 2718281828459045235360287471352662497757247093699959574966967627
+    a = karatsuba(x, y)
+    print(a)
+    print(a == x * y)
