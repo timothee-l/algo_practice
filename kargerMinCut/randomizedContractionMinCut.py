@@ -46,7 +46,7 @@ def RCA():
         for i in range(n):
             if G[i][0] is not v1:
                 G[i] = [v1 if vert is v2 else vert for vert in G[i]]  # (2/2)
-    return len(G[1])
+    return len(G[1]-1)
 
 
 def main():
@@ -54,8 +54,6 @@ def main():
     N = int((len(graph) ** 2) * math.log(len(graph)))  # 1-(1/n) chance of success
     for k in range(N):
         kCut = RCA()
-        if k % 4 == 0:
-            print("k=", k, "  crossingEdges=", crossingEdges)
         if kCut < crossingEdges:
             crossingEdges = kCut
     print("Min cut found has " + str(crossingEdges) + " crossing edges.")
