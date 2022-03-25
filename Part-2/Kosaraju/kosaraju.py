@@ -1,4 +1,6 @@
-import csv, threading, sys
+import csv
+import sys
+import threading
 
 sys.setrecursionlimit(800000)
 threading.stack_size(67108864)
@@ -18,11 +20,15 @@ with open('input.txt', 'r') as read_obj:
 
 t = 0  # keeps count of the number of nodes processed
 s = None  # keeps track of the current source vertex
+# Bitset à la place d'int
 explored = [1] * n  # Vertices "explored" have value 0 (vertices indexed by label)
 leader = [0] * n  # Gives "leading" vertex for each vertex (vertices indexed by label)
 finishingTime = [0] * n  # Returns finishing time associated to vertex label index
 finishingTimeVert = [0] * n  # Inverse of finishingTime
 leaderCount = {}  # Counts vertices leaded by given vertex (vertices indexed by label)
+
+RAL1 = {}
+RAL2 = {}
 
 
 # Input is a graph G containing n nodes, m vertices
@@ -64,10 +70,9 @@ def DFS1(i):
     global finishingTimeVert
     global finishingTime
     explored[i] = 0
-    for e in G:
-        v = e[1] - 1  # Edges reversed
-        if v == i:
-            w = e[0] - 1
+    if (i+1) in RAL1:
+        for w in RAL1[i + 1]:
+            w -= 1
             if explored[w] == 1:
                 DFS1(w)
     finishingTimeVert[t] = i
@@ -81,10 +86,9 @@ def DFS2(i):
     explored[i] = 0
     leader[finishingTimeVert[i]] = finishingTimeVert[s]
     leaderCount[finishingTimeVert[s]] = leaderCount.get(finishingTimeVert[s], 0) + 1
-    for e in G:
-        v = e[0] - 1
-        if v == finishingTimeVert[i]:
-            w = e[1] - 1
+    if (finishingTimeVert[i]+1) in RAL2:
+        for w in RAL2[finishingTimeVert[i]+1]:
+            w -= 1
             if explored[finishingTime[w]] == 1:
                 DFS2(finishingTime[w])
 
@@ -92,6 +96,15 @@ def DFS2(i):
 def main():
     print("Start")
     # 1. DFSLoop(G [edges reversed])
+    for e in G:
+        if e[1] not in RAL1:
+            RAL1[e[1]] = [e[0]]
+        else:
+            RAL1[e[1]].append(e[0])
+        if e[0] not in RAL2:
+            RAL2[e[0]] = [e[1]]
+        else:
+            RAL2[e[0]].append(e[1])
     DFSLoop(1)  # OK
     print("Lapse 1 Done")
     # 2. DFSLoop(G [vertex labelled as finishing times])
@@ -105,9 +118,9 @@ def main():
         max_key = max(leaderCount, key=leaderCount.get)
         out += str(max_value) + ' '
         leaderCount.pop(max_key)
-    print("Size of the {}-largest SCCs : {}".format(nScc,out))
+    print("Size of the {}-largest SCCs : {}".format(nScc, out))
 
 
 thread = threading.Thread(target=main)
 thread.start()
-#main()
+# main()
