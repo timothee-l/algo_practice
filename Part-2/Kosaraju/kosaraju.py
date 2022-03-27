@@ -1,12 +1,13 @@
 import csv
 import sys
 import threading
+import timeit
 
 sys.setrecursionlimit(800000)
 threading.stack_size(67108864)
 
 # Goal : compute SCCs with Kosaraju's Algorithm and return size of the nScc largest SCCs
-
+start = timeit.default_timer()
 nScc = 5  # Number of strongly connected components necessary (nScc largest)
 n = 875714  # Number of nodes in input graph
 m = 5105042  # Number of edges in input graph
@@ -118,7 +119,8 @@ def main():
         max_key = max(leaderCount, key=leaderCount.get)
         out += str(max_value) + ' '
         leaderCount.pop(max_key)
-    print("Size of the {}-largest SCCs : {}".format(nScc, out))
+    stop = timeit.default_timer()
+    print(stop - start) # 11 seconds
 
 
 thread = threading.Thread(target=main)
