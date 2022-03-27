@@ -1,4 +1,3 @@
-import heapq
 import heapq as hq
 import csv
 
@@ -16,32 +15,29 @@ shortestPath = {1: 0}  # Length of the shortest pass from s (labelled 1) to v (l
 
 
 def createHeap():
-    # Heap contains the following dictionary sorted by values
-    # Dictionary : (vertex v : smallest Dijkstra greedy score of edges (u,v) where u has already been processed)
+    # Heap contains the greedy criterion for an edge and the label of it's head vertex
     heap = []
     for k, v in graph.items():
         if k in shortestPath:
-            continue  # Already processed vertex
+            continue  # Ignoring starting vertex
         bestScore = 1000000
         for (w, length) in v:
             if w in shortestPath:
                 greedyScore = shortestPath[w] + length
                 if greedyScore < bestScore:
                     bestScore = greedyScore
-        hq.heappush(heap, (bestScore, k))
+        hq.heappush(heap, (bestScore, k))  # bestScore used as heap
     return heap
 
 
-# Dijkstra algorithm
 def dijkstra():
     heap = createHeap()
     for _ in range(n - 1):  # For every vertex in graph (other than starting vertex 1)
-        greedyScore, w = heapq.heappop(heap)  # Next vertex to be processed
+        greedyScore, w = hq.heappop(heap)  # Next vertex to be processed
         shortestPath[w] = greedyScore
-        for [v, length] in graph[w]:
+        for [v, length] in graph[w]:  # Finds the new crossing edges (with v as head) and re-evaluates greedy criterion
             if v not in shortestPath:
-                oldScore = 0
-                for item in heap:  # TODO : keeping track of priority
+                for item in heap:  # TODO : improvement : keeping track of priority instead ?
                     if item[1] == v:
                         oldScore = item[0]
                         heap.remove(item)
