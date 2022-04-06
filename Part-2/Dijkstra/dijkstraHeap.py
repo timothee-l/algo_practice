@@ -26,7 +26,7 @@ def createHeap():
                 greedyScore = shortestPath[w] + length
                 if greedyScore < bestScore:
                     bestScore = greedyScore
-        hq.heappush(heap, (bestScore, k))  # bestScore used as heap
+        hq.heappush(heap, (bestScore, k))  # bestScore used as heap key
     return heap
 
 
@@ -35,7 +35,7 @@ def dijkstra():
     for _ in range(n - 1):  # For every vertex in graph (other than starting vertex 1)
         greedyScore, w = hq.heappop(heap)  # Next vertex to be processed
         shortestPath[w] = greedyScore
-        for [v, length] in graph[w]:  # Finds the new crossing edges (with v as head) and re-evaluates greedy criterion
+        for [v, length] in graph[w]:  # Finds the new crossing edges and re-evaluates greedy criterion
             if v not in shortestPath:
                 for item in heap:  # TODO : improvement : keeping track of priority instead ?
                     if item[1] == v:
